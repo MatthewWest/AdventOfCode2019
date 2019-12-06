@@ -19,6 +19,7 @@ def part1():
 
 	planets.remove('COM')
 
+	# Trace up to the root of the tree from each node
 	n = 0
 	for planet in planets:
 		p = planet
@@ -67,6 +68,7 @@ def part2():
 				paths[n] = paths[node] + [n]
 		node = to_visit.popleft()
 
+	# The count we want is edges, so it's one less than nodes
 	return len(paths[target]) - 1
 
 print(part1())
