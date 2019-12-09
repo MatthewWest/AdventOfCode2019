@@ -103,7 +103,8 @@ class IntCodeComputer:
             self._pc += 2
             self._relative_base += p1
         else:
-            raise Exception("Unrecognized instruction '{:}' at pc {:}\nmem[{:}:{:}] = {:}".format(instruction, self._pc, self._pc, self._pc+25, self._mem[self._pc:self._pc+25]))
+            raise Exception("Unrecognized instruction '{:}' at pc {:}"\
+                .format(instruction, self._pc))
 
 
     def execute(self, blocking=True):
