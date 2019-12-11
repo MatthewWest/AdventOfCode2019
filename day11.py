@@ -2,6 +2,7 @@ from intcodecomputer import IntCodeComputer
 from queue import Queue
 from threading import Thread
 from collections import defaultdict
+from utils import defaultdict_to_string
 
 input_file = 'day11input.txt'
 
@@ -103,18 +104,7 @@ def part2():
     direc = rotate(direc, turn)
     pos = move(pos, direc)
 
-  out = []
-  for row in range(10):
-    row_str = []
-    for col in range(50):
-      pos = (col, row)
-      if panel_color[pos] == 'b':
-        row_str.append(' ')
-      elif panel_color[pos] == 'w':
-        row_str.append('#')
-    out.append(''.join(row_str))
-
-  return '\n'.join(out)
+  return defaultdict_to_string(panel_color, {'b': ' ', 'w': '#'})
 
 
 print(part1())
