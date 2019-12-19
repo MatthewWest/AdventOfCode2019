@@ -25,3 +25,15 @@ def defaultdict_to_string(d, key):
       row_str.append(key[d[pos]])
     out.append(''.join(row_str))
   return '\n'.join(out)
+
+def defaultdict_repr(d, transform=lambda c: c):
+  min_x, max_x, min_y, max_y = find_coordinate_bounds(d.keys())
+
+  out = []
+  for row in range(min_y, max_y+1):
+    row_str = []
+    for col in range(min_x, max_x+1):
+      pos = (col, row)
+      row_str.append(transform(d[pos]))
+    out.append(''.join(row_str))
+  return '\n'.join(out)

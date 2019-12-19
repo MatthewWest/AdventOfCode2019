@@ -1,10 +1,13 @@
+from collections import defaultdict
 from itertools import permutations
 from queue import Queue
 from threading import Thread
 
 class IntCodeComputer:
     def __init__(self, mem, input_q, output_q, starting_pc=0):
-        self._mem = mem + [0 for _ in range(100000)]
+        self._mem = defaultdict(lambda: 0)
+        for i, m in enumerate(mem):
+            self._mem[i] = m
         self._pc = starting_pc
         self._input_q = input_q
         self._output_q = output_q
