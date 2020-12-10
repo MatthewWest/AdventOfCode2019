@@ -1,10 +1,11 @@
 from collections import defaultdict
 from itertools import permutations
-from queue import Queue
+from queue import Queue, Empty
 from threading import Thread
 
+
 class IntCodeComputer:
-    def __init__(self, mem, input_q, output_q, starting_pc=0):
+    def __init__(self, mem, input_q, output_q, starting_pc=0, default_input=None):
         self._mem = defaultdict(lambda: 0)
         for i, m in enumerate(mem):
             self._mem[i] = m
@@ -13,12 +14,11 @@ class IntCodeComputer:
         self._output_q = output_q
         self._halted = False
         self._relative_base = 0
-
+        self._default_input = default_input
 
     @property
     def halted(self):
         return self._halted
-    
 
     def _get_param(self, mode, param):
         if mode == 0:
@@ -34,7 +34,8 @@ class IntCodeComputer:
         if mode == 0:
             return val
         elif mode == 1:
-            raise Exception("Illegal use of immediate mode for an output parameter")
+            raise Exception(
+                "Illegal use of immediate mode for an output parameter")
         elif mode == 2:
             return val + self._relative_base
         else:
@@ -49,7 +50,6 @@ class IntCodeComputer:
         p2_mode = (instruction // 1000) % 10
         p3_mode = (instruction // 10000) % 10
         opcode = instruction % 100
-        instruction_size = 0
         if opcode == 99:  # Halt
             self._halted = True
         elif opcode == 1 or opcode == 2:  # Add & Mul
@@ -63,7 +63,13 @@ class IntCodeComputer:
             self._pc += 4
         elif opcode == 3:  # Read Input
             out = self._get_output_address(p1_mode, self._mem[self._pc+1])
-            self._mem[out] = int(self._input_q.get(block=blocking))
+            try:
+                self._mem[out] = int(self._input_q.get(block=blocking))
+            except Empty:
+                if self._default_input:
+                    self._mem[out] = int(self._default_input)
+                else:
+                    raise
             self._pc += 2
         elif opcode == 4:  # Output
             p1 = self._get_param(p1_mode, self._mem[self._pc+1])
@@ -106,9 +112,8 @@ class IntCodeComputer:
             self._pc += 2
             self._relative_base += p1
         else:
-            raise Exception("Unrecognized instruction '{:}' at pc {:}"\
-                .format(instruction, self._pc))
-
+            raise Exception("Unrecognized instruction '{:}' at pc {:}"
+                            .format(instruction, self._pc))
 
     def execute(self, blocking=True):
         """Execute the intcode computer until it halts.
